@@ -1,9 +1,9 @@
 // ==UserScript==
-// @namespace    hjd2048.com
 // @name         2048帖子高亮图片预览
-// @version      0.0.6
 // @description  帖子高亮，列表页面直接预览帖子内图片
+// @version      0.0.6
 // @author       bluebabes
+// @namespace    hjd2048.com
 // @match        https://*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js

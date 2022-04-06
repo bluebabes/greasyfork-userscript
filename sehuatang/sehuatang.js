@@ -1,9 +1,9 @@
 // ==UserScript==
-// @namespace    https://www.sehuatang.net/forum-103-1.html
 // @name         sehuatang
+// @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
 // @version      0.0.4
 // @author       bluebabes
-// @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
+// @namespace    https://www.sehuatang.net/forum-103-1.html
 // @include      https://www.sehuatang.net/forum-*
 // @include      https://www.sehuatang.net/forum.php?mod=forumdisplay&fid=103&page=*
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
