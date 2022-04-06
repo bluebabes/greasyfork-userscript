@@ -1,15 +1,16 @@
 // ==UserScript==
-// @name         sehuatang
-// @version      0.0.3
 // @namespace    https://www.sehuatang.net/forum-103-1.html
-// @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
+// @name         sehuatang
+// @version      0.0.4
 // @author       bluebabes
+// @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
 // @include      https://www.sehuatang.net/forum-*
 // @include      https://www.sehuatang.net/forum.php?mod=forumdisplay&fid=103&page=*
-// @grant        GM_xmlhttpRequest
-// @require https://code.jquery.com/jquery-3.4.1.min.js
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
+// @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @grant        GM_xmlhttpRequest
+// @license 	 GNU GPLv3
 // ==/UserScript==
 $(document).ready(function () {
   $(".icn").each(function () {

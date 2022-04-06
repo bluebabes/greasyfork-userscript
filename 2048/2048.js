@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name         2048帖子高亮图片预览
 // @namespace    hjd2048.com
+// @name         2048帖子高亮图片预览
 // @version      0.0.6
 // @description  帖子高亮，列表页面直接预览帖子内图片
 // @author       bluebabes
 // @match        https://*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        GM_xmlhttpRequest
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
-// @license GNU GPLv3
-// @require https://code.jquery.com/jquery-3.4.1.min.js
+// @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @grant        GM_xmlhttpRequest
+// @license 	 GNU GPLv3
 // ==/UserScript==
 
 (function () {
