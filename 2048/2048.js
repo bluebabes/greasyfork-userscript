@@ -9,7 +9,7 @@
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
-// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js
+// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js?t=20220407
 // @grant        GM_xmlhttpRequest
 // @license 	   GNU GPLv3
 // ==/UserScript==
@@ -20,17 +20,6 @@
 
   // debug
   var debug = true;
-  console.log(utils.F());
-
-  var getCookies = function () {
-    var pairs = document.cookie.split(";");
-    var cookies = {};
-    for (var i = 0; i < pairs.length; i++) {
-      var pair = pairs[i].split("=");
-      cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
-    }
-    return cookies;
-  };
 
   var href = document.location.href;
   if (href.indexOf("/2048/") === -1) {
@@ -51,7 +40,9 @@
     
     var xmlOn = url.indexOf("read.php") >= 0
     if (xmlOn) {
-      GM_log("处理内部帖子图片:", url)
+      
+      utils.Log(debug, ["处理内部帖子图片:", url])
+
       GM_xmlhttpRequest({
         method: "GET",
         url: url,
@@ -66,7 +57,7 @@
           var doc = result.responseText;
           var imgs = $(doc).find(".att_img > img")
 
-          GM_log("获取图片:", imgs.length)
+          utils.Log(debug, ["获取图片:", imgs.length])
 
           for (let i = 0; i < imgs.length; i++) {
             const element = imgs[i];

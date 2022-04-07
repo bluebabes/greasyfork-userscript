@@ -20,6 +20,23 @@
     F() {
       return false;
     }
+
+    Log(debug, msgs){
+        if (debug) {
+            console.log(...msgs);
+        }
+    }
+
+    // 获取 cookies
+    GetCookies() {
+      var pairs = document.cookie.split(";");
+      var cookies = {};
+      for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split("=");
+        cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
+      }
+      return cookies;
+    }
   }
   if (typeof noGlobal === "undefined") {
     window.utils = new utils();
