@@ -13,4 +13,7 @@ class log {
     }
 }
 
-module.exports = log;
+(function (msgs) {
+    var log = new log(true)
+    log.info(msgs)
+})( msgs);
