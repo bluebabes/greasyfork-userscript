@@ -9,6 +9,7 @@
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/log.js
 // @grant        GM_xmlhttpRequest
 // @license 	 GNU GPLv3
 // ==/UserScript==
@@ -16,6 +17,14 @@
 (function () {
   "use strict";
   $("head").append($(`<style></style>`));
+
+  // debug
+  var debug = true;
+  var log = (msgs = [] )=>{
+    if (debug) {
+      console.log(...msgs)
+    }
+  }
 
   var getCookies = function () {
     var pairs = document.cookie.split(";");
@@ -43,8 +52,10 @@
     if (href.indexOf("search.php") >= 0) {
       thattd = that.find("th:eq(0)");
     }
-    // console.log(url,url.indexOf("read.php") >= 0);
-    if (url.indexOf("read.php") >= 0) {
+    
+    var xmlOn = url.indexOf("read.php") >= 0
+    if (xmlOn) {
+      GM_log("处理内部帖子图片:", url)
       GM_xmlhttpRequest({
         method: "GET",
         url: url,
@@ -57,26 +68,28 @@
         },
         onload: function (result) {
           var doc = result.responseText;
-          console.log(doc);
-          $(doc)
-            .find(".att_img > img")
-            .each(function (index) {
-              if (index == 0) {
-                thattd.append("<br />");
-              }
-              // console.log( index + ": " + $(this).attr('src'),thattd );
-              var src = $(this).attr("src");
-              src = src.replace("http://", "https://");
+          var imgs = $(doc).find(".att_img > img")
 
-              thattd.append(
-                "<img object-fit='contain' style='width:200px;' src='" +
-                  src +
-                  "' />"
-              );
-            });
+          GM_log("获取图片:", imgs.length)
+
+          for (let i = 0; i < imgs.length; i++) {
+            const element = imgs[i];
+            if (i == 0) {
+              thattd.append("<br />");
+            }
+            var src = element.getAttribute("src");
+            src = src.replace("http://", "https://");
+
+            thattd.append(
+              "<img object-fit='contain' style='width:200px;' src='" +
+                src +
+                "' />"
+            );
+          }
         },
       });
     }
+
   });
 
   // 高亮回复数大于xx数的帖子
