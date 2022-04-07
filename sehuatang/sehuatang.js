@@ -13,18 +13,17 @@
 // @license 	 GNU GPLv3
 // ==/UserScript==
 $(document).ready(function () {
+  var host = "https://www.sehuatang.net"
   $(".icn").each(function () {
-    var urls = "https://www.sehuatang.net/";
-    urls += $(this).find("a").attr("href");
+    var uri = host + "/" +  $(this).find("a").attr("href");
+    
     var imgg = $(this).find("img");
     var icn_td = $(this);
-    console.log(urls);
-
     var href = document.location.href;
 
     GM_xmlhttpRequest({
       method: "GET",
-      url: urls,
+      url: uri,
       headers: {
         "User-agent": window.navigator.userAgent,
         Accept:
@@ -37,14 +36,11 @@ $(document).ready(function () {
       },
       onload: function (result) {
         var doc = result.responseText;
-        console.log(doc);
         var img01 = $(doc).find(".zoom").attr("file");
         $(imgg).attr("src", img01);
         var dvi01 = $(doc).find(".blockcode");
         var dvi02 = $(doc).find("#thread_subject");
-        //console.log($(dvi02).html());
         var magnet = $(dvi01).find("li").text();
-        //console.log(magnet);
         $(icn_td).css("width", "100%");
         $(icn_td).append(
           "<p style='margin-top: 20px;font-size: 2em;'>" +

@@ -147,7 +147,6 @@
       document.location.origin + "/2048/" + $(this).find("a").attr("href");
 
     var thattd = that.find("td:eq(1)");
-    // thattd.append("<img object-fit='contain' style='width:200px;' src='" + "https://www.ressim.net/resimler/2021/12/20/18_10250321.jpg" + "' />")
     if (href.indexOf("search.php") >= 0) {
       thattd = that.find("th:eq(0)");
     }
