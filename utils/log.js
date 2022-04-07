@@ -13,4 +13,4 @@ class log {
     }
 }
 
-export default log
+module.exports = log;

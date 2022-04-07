@@ -11,7 +11,7 @@
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/log.js
 // @grant        GM_xmlhttpRequest
-// @license 	 GNU GPLv3
+// @license 	   GNU GPLv3
 // ==/UserScript==
 
 (function () {
@@ -20,11 +20,8 @@
 
   // debug
   var debug = true;
-  var log = (msgs = [] )=>{
-    if (debug) {
-      console.log(...msgs)
-    }
-  }
+  var logz = new log(true)
+  logz.info("good")
 
   var getCookies = function () {
     var pairs = document.cookie.split(";");
