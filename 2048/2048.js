@@ -11,6 +11,11 @@
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js?t=20220407
 // @grant        GM_xmlhttpRequest
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_openInTab
+// @grant        GM_unregisterMenuCommand
+// @grant        GM_registerMenuCommand
 // @license 	   GNU GPLv3
 // ==/UserScript==
 
@@ -20,6 +25,115 @@
 
   // debug
   var debug = true;
+
+  // 增加菜单
+  var menu_ALL = [["menu_disable", "✅ 已启用", "❌ 已禁用", []]];
+  var menu_ID = [];
+  for (let i = 0; i < menu_ALL.length; i++) {
+    // 如果读取到的值为 null 就写入默认值
+    if (GM_getValue(menu_ALL[i][0]) == null) {
+      GM_setValue(menu_ALL[i][0], menu_ALL[i][3]);
+    }
+  }
+  // 注册脚本菜单
+  if (menu_ID.length != []) {
+    for (let i = 0; i < menu_ID.length; i++) {
+      GM_unregisterMenuCommand(menu_ID[i]);
+    }
+  }
+  for (let i = 0; i < menu_ALL.length; i++) {
+    // 循环注册脚本菜单
+    menu_ALL[i][3] = GM_getValue(menu_ALL[i][0]);
+    if (menu_ALL[i][0] === "menu_disable") {
+      // 启用/禁用护眼模式 (当前网站)
+      if (menu_disable("check")) {
+        // 当前网站是否已存在禁用列表中
+        menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][2]}`, function () {
+          menu_disable("del");
+        });
+        return;
+      } else {
+        if (
+          GM_getValue("menu_darkModeAuto") &&
+          !window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+          menu_ID[i] = GM_registerMenuCommand(
+            `❌ 当前浏览器为白天模式 (点击关闭 [护眼模式跟随浏览器])`,
+            function () {
+              GM_setValue("menu_darkModeAuto", false);
+              location.reload();
+            }
+          );
+          return;
+        }
+        menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][1]}`, function () {
+          menu_disable("add");
+        });
+      }
+    }
+  }
+  menu_ID[menu_ID.length] = GM_registerMenuCommand(
+    "💬 反馈 & 建议",
+    function () {
+      window.GM_openInTab(
+        "https://github.com/bluebabes/greasyfork-userscript/issues",
+        {
+          active: true,
+          insert: true,
+          setParent: true,
+        }
+      );
+    }
+  );
+
+  // 返回菜单值
+  function menu_value(menuName) {
+    for (let menu of menu_ALL) {
+      if (menu[0] == menuName) {
+        return menu[3];
+      }
+    }
+  }
+
+  // 启用/禁用 (当前网站)
+  function menu_disable(type) {
+    switch (type) {
+      case "check":
+        if (check()) return true;
+        return false;
+        break;
+      case "add":
+        add();
+        break;
+      case "del":
+        del();
+        break;
+    }
+
+    function check() {
+      // 存在返回真，不存在返回假
+      let websiteList = menu_value("menu_disable"); // 读取网站列表
+      if (websiteList.indexOf(location.host) === -1) return false; // 不存在返回假
+      return true;
+    }
+
+    function add() {
+      if (check()) return;
+      let websiteList = menu_value("menu_disable"); // 读取网站列表
+      websiteList.push(location.host); // 追加网站域名
+      GM_setValue("menu_disable", websiteList); // 写入配置
+      location.reload(); // 刷新网页
+    }
+
+    function del() {
+      if (!check()) return;
+      let websiteList = menu_value("menu_disable"), // 读取网站列表
+        index = websiteList.indexOf(location.host);
+      websiteList.splice(index, 1); // 删除网站域名
+      GM_setValue("menu_disable", websiteList); // 写入配置
+      location.reload(); // 刷新网页
+    }
+  }
 
   var href = document.location.href;
   if (href.indexOf("/2048/") === -1) {
@@ -37,11 +151,10 @@
     if (href.indexOf("search.php") >= 0) {
       thattd = that.find("th:eq(0)");
     }
-    
-    var xmlOn = url.indexOf("read.php") >= 0
+
+    var xmlOn = url.indexOf("read.php") >= 0;
     if (xmlOn) {
-      
-      utils.Log(debug, ["处理内部帖子图片:", url])
+      utils.Log(debug, ["处理内部帖子图片:", url]);
 
       GM_xmlhttpRequest({
         method: "GET",
@@ -55,9 +168,9 @@
         },
         onload: function (result) {
           var doc = result.responseText;
-          var imgs = $(doc).find(".att_img > img")
+          var imgs = $(doc).find(".att_img > img");
 
-          utils.Log(debug, ["获取图片:", imgs.length])
+          utils.Log(debug, ["获取图片:", imgs.length]);
 
           for (let i = 0; i < imgs.length; i++) {
             const element = imgs[i];
@@ -76,7 +189,6 @@
         },
       });
     }
-
   });
 
   // 高亮回复数大于xx数的帖子
