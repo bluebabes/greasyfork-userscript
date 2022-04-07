@@ -9,7 +9,7 @@
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
-// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/log.js
+// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js
 // @grant        GM_xmlhttpRequest
 // @license 	   GNU GPLv3
 // ==/UserScript==
@@ -20,8 +20,7 @@
 
   // debug
   var debug = true;
-  var logz = new log(true)
-  logz.info("good")
+  console.log(utils.F());
 
   var getCookies = function () {
     var pairs = document.cookie.split(";");
