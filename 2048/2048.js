@@ -163,7 +163,7 @@
   }
 
   // 2048 列表逻辑处理
-  if (isUrlList()) {
+  if (isUrlList() || href.indexOf("search.php") >= 0) {
     // other
     document.querySelector(".TOP_PD") &&
     document.querySelector(".TOP_PD").remove();
@@ -190,9 +190,6 @@
       // 处理图片
       var title = thattd.find("a").first().text();
       var isBlacked = filterDetailUrl(title);
-      if (isBlacked) {
-        that.remove();
-      }
       if (!isBlacked && !menu_disable("check")) {
         utils.Log(debug, ["处理内部帖子图片:", title, url]);
         GM_xmlhttpRequest({
