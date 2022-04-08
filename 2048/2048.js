@@ -134,7 +134,8 @@
   // 检查是否是列表
   function isUrlList() {
     var reg = /fid-[\d]+.html/g;
-    return href.match(reg).length > 0;
+    var res = href.match(reg);
+    return res && href.match(reg).length > 0;
   }
   // 检查是否是帖子
   function isUrlDetail() {
@@ -145,6 +146,7 @@
     if (!title) {
       return true;
     }
+    var isBlack = false;
     var filters = [
       "來訪者必看的內容",
       "請各位更換新的文宣",
@@ -154,14 +156,20 @@
     ];
     filters.forEach((element) => {
       if (title.indexOf(element) > 0) {
-        return true;
+        isBlack = true;
       }
     });
-    return false;
+    return isBlack;
   }
 
   // 2048 列表逻辑处理
   if (isUrlList()) {
+    // other
+    document.querySelector(".TOP_PD") &&
+    document.querySelector(".TOP_PD").remove();
+    document.querySelector(".TOP_PD2") &&
+    document.querySelector(".TOP_PD2").remove();
+
     let origin = document.location.origin;
     // 列表循环
     $(".tr3").each(function () {
@@ -175,15 +183,18 @@
       }
 
       // a的数量异常删除
-      if (thattd.find("a").length > 2) {
+      if (thattd.find("a").length > 5) {
         that.remove();
       }
 
       // 处理图片
       var title = thattd.find("a").first().text();
-      var xmlOn = filterDetailUrl(title);
-      if (!xmlOn && !menu_disable("check")) {
-        utils.Log(debug, ["处理内部帖子图片:",title, url]);
+      var isBlacked = filterDetailUrl(title);
+      if (isBlacked) {
+        that.remove();
+      }
+      if (!isBlacked && !menu_disable("check")) {
+        utils.Log(debug, ["处理内部帖子图片:", title, url]);
         GM_xmlhttpRequest({
           method: "GET",
           url: url,
@@ -240,5 +251,8 @@
         }
       }
     }
+  } else {
+    document.querySelector("#footer") &&
+    document.querySelector("#footer").remove();
   }
 })();
