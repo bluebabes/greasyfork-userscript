@@ -21,10 +21,10 @@
       return false;
     }
 
-    Log(debug, msgs){
-        if (debug) {
-            console.log(...msgs);
-        }
+    Log(debug, msgs) {
+      if (debug) {
+        console.log(...msgs);
+      }
     }
 
     // 获取 cookies
@@ -36,6 +36,52 @@
         cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
       }
       return cookies;
+    }
+
+    // 过滤数据
+    Unique(arr) {
+      var res = [];
+      var obj = {};
+      for (var i = 0; i < arr.length; i++) {
+        if (!obj[arr[i]] && arr[i] != "") {
+          obj[arr[i]] = 1;
+          res.push(arr[i]);
+        }
+      }
+      return res;
+    }
+
+    // 工具-图片补全
+    ImgSrcComplate(getimgSrc) {
+      let url = document.location.href;
+      if (
+        getimgSrc == null ||
+        getimgSrc == "" ||
+        getimgSrc.indexOf("data:image") >= 0
+      ) {
+        return getimgSrc;
+      }
+      try {
+        var z = new URL(url);
+        // 处理 url 问题
+        if (getimgSrc.indexOf("chrome") >= 0) {
+          getimgSrc = getimgSrc.replace("chrome-extension:", z.protocol);
+        }
+        if (getimgSrc.indexOf("http") === -1) {
+          if (getimgSrc.indexOf("//") === 0) {
+            getimgSrc = z.protocol + getimgSrc;
+          } else {
+            getimgSrc = getimgSrc.replace("//", "/");
+            if (getimgSrc.indexOf("/") !== 0) {
+              getimgSrc = "/" + getimgSrc;
+            }
+            getimgSrc = z.origin + getimgSrc.replace("//", "/");
+          }
+        }
+      } catch (error) {
+        console.warn(error, url);
+      }
+      return getimgSrc;
     }
   }
   if (typeof noGlobal === "undefined") {

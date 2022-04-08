@@ -45,27 +45,15 @@
     // 循环注册脚本菜单
     menu_ALL[i][3] = GM_getValue(menu_ALL[i][0]);
     if (menu_ALL[i][0] === "menu_disable") {
-      // 启用/禁用护眼模式 (当前网站)
+      // 当前网站是否已存在禁用列表中
       if (menu_disable("check")) {
-        // 当前网站是否已存在禁用列表中
+        // 已禁用
         menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][2]}`, function () {
           menu_disable("del");
         });
         return;
       } else {
-        if (
-          GM_getValue("menu_darkModeAuto") &&
-          !window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
-          menu_ID[i] = GM_registerMenuCommand(
-            `❌ 当前浏览器为白天模式 (点击关闭 [护眼模式跟随浏览器])`,
-            function () {
-              GM_setValue("menu_darkModeAuto", false);
-              location.reload();
-            }
-          );
-          return;
-        }
+        // 开启状态
         menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][1]}`, function () {
           menu_disable("add");
         });
@@ -140,81 +128,85 @@
     return;
   }
 
-  // 预览内容图片
-  $(".tr3").each(function () {
-    var that = $(this);
-    var url =
-      document.location.origin + "/2048/" + $(this).find("a").attr("href");
+  // 逻辑处理
+  if (!menu_disable("check")) {
+    // 预览内容图片
+    $(".tr3").each(function () {
+      var that = $(this);
+      var url =
+        document.location.origin + "/2048/" + $(this).find("a").attr("href");
 
-    var thattd = that.find("td:eq(1)");
-    if (href.indexOf("search.php") >= 0) {
-      thattd = that.find("th:eq(0)");
-    }
-
-    var xmlOn = url.indexOf("read.php") >= 0;
-    if (xmlOn) {
-      utils.Log(debug, ["处理内部帖子图片:", url]);
-
-      GM_xmlhttpRequest({
-        method: "GET",
-        url: url,
-        headers: {
-          "User-agent": window.navigator.userAgent,
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-          cookie: document.cookie,
-          referer: href,
-        },
-        onload: function (result) {
-          var doc = result.responseText;
-          var imgs = $(doc).find(".att_img > img");
-
-          utils.Log(debug, ["获取图片:", imgs.length]);
-
-          for (let i = 0; i < imgs.length; i++) {
-            const element = imgs[i];
-            if (i == 0) {
-              thattd.append("<br />");
-            }
-            var src = element.getAttribute("src");
-            src = src.replace("http://", "https://");
-
-            thattd.append(
-              "<img object-fit='contain' style='width:200px;' src='" +
-                src +
-                "' />"
-            );
-          }
-        },
-      });
-    }
-  });
-
-  // 高亮回复数大于xx数的帖子
-  var highlightCount = 5;
-  var tr3s = document.querySelectorAll(".tr3");
-  for (var i = 0; i < tr3s.length; i++) {
-    var element = tr3s[i];
-    var td = element.querySelectorAll("td");
-
-    // 高亮
-    if (td[3]) {
-      if (td[3].textContent * 1 > highlightCount) {
-        td[1].style.backgroundColor = "#baccd9";
-        td[3].style.backgroundColor = "#baccd9";
+      var thattd = that.find("td:eq(1)");
+      if (href.indexOf("search.php") >= 0) {
+        thattd = that.find("th:eq(0)");
       }
-    }
 
-    if (
-      (td[1] && td[1].textContent.indexOf("澳门") > 0) ||
-      (td[1] && td[1].textContent.indexOf("赌场") > 0) ||
-      (td[1] && td[1].textContent.indexOf("浏览2048需要注意的点") > 0) ||
-      (td[1] && td[1].textContent.indexOf("免费互约APP") > 0) ||
-      (td[1] && td[1].textContent.indexOf("国产抖阴小视频") > 0) ||
-      (td[1] && td[1].textContent.indexOf("区发贴教程详解") > 0) ||
-      (td[1] && td[1].textContent.indexOf("自售区版规细则及发帖标准") > 0)
-    ) {
-      td[1].parentNode.remove();
+      var xmlOn = url.indexOf("read.php") >= 0;
+      if (xmlOn) {
+        utils.Log(debug, ["处理内部帖子图片:", url]);
+
+        GM_xmlhttpRequest({
+          method: "GET",
+          url: url,
+          headers: {
+            "User-agent": window.navigator.userAgent,
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            cookie: document.cookie,
+            referer: href,
+          },
+          onload: function (result) {
+            var doc = result.responseText;
+            var imgs = $(doc).find(".att_img > img");
+
+            utils.Log(debug, ["获取图片:", imgs.length]);
+
+            for (let i = 0; i < imgs.length; i++) {
+              const element = imgs[i];
+              if (i == 0) {
+                thattd.append("<br />");
+              }
+              var src = element.getAttribute("src");
+              src = src.replace("http://", "https://");
+
+              thattd.append(
+                "<img object-fit='contain' style='width:200px;' src='" +
+                  src +
+                  "' />"
+              );
+            }
+          },
+        });
+      }
+    });
+
+    // 高亮回复数大于xx数的帖子
+    var highlightCount = 5;
+    var tr3s = document.querySelectorAll(".tr3");
+    for (var i = 0; i < tr3s.length; i++) {
+      var element = tr3s[i];
+      var td = element.querySelectorAll("td");
+
+      // 高亮
+      if (td[3]) {
+        if (td[3].textContent * 1 > highlightCount) {
+          td[1].style.backgroundColor = "#baccd9";
+          td[3].style.backgroundColor = "#baccd9";
+        }
+      }
+
+      if (
+        (td[1] && td[1].textContent.indexOf("澳门") > 0) ||
+        (td[1] && td[1].textContent.indexOf("赌场") > 0) ||
+        (td[1] && td[1].textContent.indexOf("上门约啪！") > 0) ||
+        (td[1] && td[1].textContent.indexOf("浏览2048需要注意的点") > 0) ||
+        (td[1] && td[1].textContent.indexOf("免费互约APP") > 0) ||
+        (td[1] && td[1].textContent.indexOf("国产抖阴小视频") > 0) ||
+        (td[1] && td[1].textContent.indexOf("区发贴教程详解") > 0) ||
+        (td[1] && td[1].textContent.indexOf("自售区版规细则及发帖标准") > 0)
+      ) {
+        td[1].parentNode.remove();
+      }
     }
   }
 })();
