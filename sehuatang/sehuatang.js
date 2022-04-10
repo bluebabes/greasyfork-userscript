@@ -83,14 +83,31 @@ $(document).ready(function () {
         ) {
           continue;
         }
-        getData(UrlComplate(hrefth)).then((data)=>{
-          var zooms = data.querySelectorAll(".zoom");
-          zooms.forEach((ele)=>{
-            console.log(ele.getAttribute("src"));
+        getData(UrlComplate(hrefth))
+          .then((data) => {
+            var doc = new DOMParser().parseFromString(data, "text/html");
+            var zooms = doc.querySelectorAll(".zoom");
+            var imgs = [];
+            zooms.forEach((ele) => {
+              imgs.push(ele.getAttribute("file"));
+            });
+            // 插入到 th 中
+            imgs.forEach((src, index) => {
+              if (index == 0) {
+                th.append(document.createElement("<br />"));
+              }
+              if (src && src.length > 10) {
+                const node = document.createElement("img");
+                node["src"] = src;
+                node["style"] = "width:200px;";
+                node.style.objectFit = 'contain';
+                th.append(node);
+              }
+            });
           })
-        }).catch(e=>{
-          console.log(e);
-        })
+          .catch((e) => {
+            console.log(e);
+          });
       }
     });
   });
