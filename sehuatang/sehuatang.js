@@ -26,6 +26,14 @@ $(document).ready(function () {
     return host + "/" + path;
   }
 
+  function getImgStyle(){
+    if (href.indexOf("forum-151-1.html") > 0) {
+      return "width:200px;margin:1px;"
+    }
+
+    return "width:200px;margin:1px;"
+  }
+
   function getData(uri) {
     return new Promise((resolve, reject) => {
       GM_xmlhttpRequest({
@@ -86,7 +94,7 @@ $(document).ready(function () {
               if (src && src.length > 10) {
                 const node = document.createElement("img");
                 node["src"] = src;
-                node["style"] = "width:200px;margin:1px;";
+                node["style"] = getImgStyle();
                 node.style.objectFit = 'contain';
                 th.append(node);
               }
