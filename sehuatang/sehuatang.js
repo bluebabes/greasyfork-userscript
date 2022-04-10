@@ -28,10 +28,10 @@ $(document).ready(function () {
 
   function getImgStyle(){
     if (href.indexOf("forum-151-1.html") > 0) {
-      return "width:200px;margin:1px;"
+      return "width:400px;margin:1px;"
     }
 
-    return "width:200px;margin:1px;"
+    return "width:400px;margin:1px;"
   }
 
   function getData(uri) {
