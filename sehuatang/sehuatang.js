@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sehuatang
 // @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
-// @version      0.0.4
+// @version      0.0.5
 // @author       bluebabes
 // @namespace    www.sehuatang.net
 // @include      https://www.sehuatang.net/forum-*
@@ -47,20 +47,6 @@ $(document).ready(function () {
           var doc = result.responseText;
           resolve(doc);
           return;
-          // var img01 = $(doc).find(".zoom").attr("file");
-          // $(imgg).attr("src", img01);
-          // var dvi01 = $(doc).find(".blockcode");
-          // var dvi02 = $(doc).find("#thread_subject");
-          // var magnet = $(dvi01).find("li").text();
-          // $(icn_td).css("width", "100%");
-          // $(icn_td).append(
-          //   "<p style='margin-top: 20px;font-size: 2em;'>" +
-          //     $(dvi02).html() +
-          //     "</p><br/>"
-          // );
-          // $(icn_td).append(
-          //   "<p style='margin-top: 20px;font-size: 2em;'>" + magnet + "</p><br/>"
-          // );
         },
       });
     });
@@ -94,12 +80,13 @@ $(document).ready(function () {
             // 插入到 th 中
             imgs.forEach((src, index) => {
               if (index == 0) {
-                th.append(document.createElement("<br />"));
+                var br = document.createElement("br");
+                th.append(br);
               }
               if (src && src.length > 10) {
                 const node = document.createElement("img");
                 node["src"] = src;
-                node["style"] = "width:200px;";
+                node["style"] = "width:200px;margin:1px;";
                 node.style.objectFit = 'contain';
                 th.append(node);
               }
