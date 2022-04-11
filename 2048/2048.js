@@ -142,23 +142,25 @@
     return !isUrlList;
   }
   // 过滤
-  function filterDetailUrl(title) {
+  var filters = [
+    "來訪者必看的內容",
+    "請各位更換新的文宣",
+    "外站图床推荐",
+    "开放主题",
+    "同城兼职少妇",
+  ];
+  function isBlackTitle(title) {
     if (!title) {
       return true;
     }
     var isBlack = false;
-    var filters = [
-      "來訪者必看的內容",
-      "請各位更換新的文宣",
-      "外站图床推荐",
-      "开放主题",
-      "同城兼职少妇",
-    ];
-    filters.forEach((element) => {
-      if (title.indexOf(element) > 0) {
+    for (let i = 0; i < filters.length; i++) {
+      const element = filters[i];
+      if (title.indexOf(element) >= 0) {
         isBlack = true;
+        break;
       }
-    });
+    }
     return isBlack;
   }
 
@@ -189,7 +191,7 @@
 
       // 处理图片
       var title = thattd.find("a").first().text();
-      var isBlacked = filterDetailUrl(title);
+      var isBlacked = isBlackTitle(title);
       if (!isBlacked && !menu_disable("check")) {
         utils.Log(debug, ["处理内部帖子图片:", title, url]);
         GM_xmlhttpRequest({

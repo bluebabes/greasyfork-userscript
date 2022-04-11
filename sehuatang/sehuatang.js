@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sehuatang
 // @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
-// @version      0.0.5
+// @version      0.0.6
 // @author       bluebabes
 // @namespace    www.sehuatang.net
 // @include      https://www.sehuatang.net/forum-*
@@ -9,29 +9,70 @@
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js?t=20220407
 // @grant        GM_xmlhttpRequest
 // @license 	 GNU GPLv3
 // ==/UserScript==
 $(document).ready(function () {
   var host = "https://www.sehuatang.net";
   var href = document.location.href;
+
+  // 过滤
+  var filters = [
+    "最新永久访问本站",
+    "新安卓发布",
+    "二次验证丢失",
+    "同样花钱",
+    "想得到邀请码的进",
+    "邀请码广告主题",
+    "本站方法和安卓",
+    "大家下载反馈",
+  ];
+  function isBlackTitle(title) {
+    if (!title) {
+      return true;
+    }
+    var isBlack = false;
+    for (let i = 0; i < filters.length; i++) {
+      const element = filters[i];
+      if (title.indexOf(element) >= 0) {
+        isBlack = true;
+        break;
+      }
+    }
+    return isBlack;
+  }
+
   // 检查是否是列表
   function isUrlList() {
     var reg = /forum-[\d-]+.html/g;
     var res = href.match(reg);
     return res && href.match(reg).length > 0;
   }
+  function isNum(str) {
+    var reg = /[\d-]+/g;
+    var res = str.match(reg);
+    return res && str.match(reg).length > 0;
+  }
+  function isFirstPage(str) {
+    var reg = /1-[\d-]+.html/g;
+    var res = str.match(reg);
+    return res && str.match(reg).length > 0;
+  }
+  function isChinese(){
+    return href.indexOf("forum-103-") > 0
+  }
 
   function UrlComplate(path) {
     return host + "/" + path;
   }
 
-  function getImgStyle(){
-    if (href.indexOf("forum-151-1.html") > 0) {
-      return "width:400px;margin:1px;"
+  function getImgStyle() {
+    if (isChinese()) {
+      return "width:800px;margin:1px;display:block;";
     }
 
-    return "width:400px;margin:1px;"
+    return "width:400px;margin:1px;display:block;";
   }
 
   function getData(uri) {
@@ -61,100 +102,97 @@ $(document).ready(function () {
   }
 
   // 主业务逻辑
-  var table = document.querySelector("#threadlisttableid");
-  var trs = table.querySelectorAll("tr");
-  trs.forEach((tr) => {
-    var ths = tr.querySelectorAll("th");
-    ths.forEach((th) => {
-      var as = th.querySelectorAll("a");
-      for (let i = 0; i < as.length; i++) {
-        const element = as[i];
-        var hrefth = element.getAttribute("href");
-        if (
-          hrefth.indexOf("javascript") >= 0 ||
-          hrefth.indexOf("typeid=") >= 0 ||
-          hrefth.indexOf("announcement") >= 0
-        ) {
-          continue;
-        }
-        getData(UrlComplate(hrefth))
-          .then((data) => {
-            var doc = new DOMParser().parseFromString(data, "text/html");
-            var zooms = doc.querySelectorAll(".zoom");
-            var imgs = [];
-            zooms.forEach((ele) => {
-              imgs.push(ele.getAttribute("file"));
-            });
-            // 插入到 th 中
-            imgs.forEach((src, index) => {
-              if (index == 0) {
-                var br = document.createElement("br");
-                th.append(br);
+  if (isUrlList()) {
+
+    //other
+    var shows = document.querySelectorAll(".show-text");
+    shows.forEach((show) => {
+      show.remove();
+    })
+  
+
+    var table = document.querySelector("#threadlisttableid");
+    var trs = table.querySelectorAll("tr");
+    trs.forEach((tr) => {
+      var tds = tr.querySelectorAll("td");
+      tds.forEach((td) => {
+        td.remove();
+      })
+
+      var ths = tr.querySelectorAll("th");
+      ths.forEach((th) => {
+        var as = th.querySelectorAll("a");
+        for (let i = 0; i < as.length; i++) {
+          const element = as[i];
+          var hrefth = element.getAttribute("href");
+          if (
+            hrefth.indexOf("javascript") >= 0 ||
+            hrefth.indexOf("typeid=") >= 0 ||
+            hrefth.indexOf("announcement") >= 0 ||
+            !isFirstPage(hrefth)
+          ) {
+            continue;
+          }
+
+          // 黑名单
+          if (isBlackTitle(element.textContent)) {
+            continue;
+          }
+
+          getData(UrlComplate(hrefth))
+            .then((data) => {
+              var doc = new DOMParser().parseFromString(data, "text/html");
+
+              // magnet
+              var magnets = []
+              var magnetObjs = doc.querySelectorAll(".blockcode li");
+              magnetObjs.forEach((ele) => {
+                magnets.push(ele.textContent);
+              });
+
+              // 图片
+              var zooms = doc.querySelectorAll(".zoom");
+              var imgs = [];
+              zooms.forEach((ele) => {
+                imgs.push(ele.getAttribute("file"));
+              });
+
+              // 过滤重复图片
+              imgs = utils.Unique(imgs);
+
+              // chinese 特殊处理
+              if (isChinese()){
+                imgs = imgs.length > 0 ? [imgs[0]]: []
               }
-              if (src && src.length > 10) {
-                const node = document.createElement("img");
-                node["src"] = src;
-                node["style"] = getImgStyle();
-                node.style.objectFit = 'contain';
+              
+              // 插入到 th 中
+              imgs.forEach((src, index) => {
+                if (src && src.length > 10) {
+                  const node = document.createElement("img");
+                  node["src"] = src;
+                  node["style"] = getImgStyle();
+                  node.style.objectFit = "contain";
+                  th.prepend(node);
+                  
+                  // br
+                  th.append(document.createElement("br"));
+                }
+              });
+
+              th.append(document.createElement("br"));
+              magnets.forEach((mag,index)=>{
+                const node = document.createElement("a");
+                node.href = mag
+                node.text = mag
                 th.append(node);
-              }
+              })
+              th.append(document.createElement("br"));
+            })
+            .catch((e) => {
+              console.log(e);
             });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      }
+        }
+      });
     });
-  });
-
-  // $(".icn").each(function () {
-  //   var uri = host + "/" + $(this).find("a").attr("href");
-
-  //   var imgg = $(this).find("img");
-  //   var icn_td = $(this);
-  //   var href = document.location.href;
-
-  //   GM_xmlhttpRequest({
-  //     method: "GET",
-  //     url: uri,
-  //     headers: {
-  //       "User-agent": window.navigator.userAgent,
-  //       Accept:
-  //         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-  //       cookie: document.cookie,
-  //       referer: href,
-  //     },
-  //     onerror: function (e) {
-  //       console.log(e);
-  //     },
-  //     onload: function (result) {
-  //       var doc = result.responseText;
-  //       var img01 = $(doc).find(".zoom").attr("file");
-  //       $(imgg).attr("src", img01);
-  //       var dvi01 = $(doc).find(".blockcode");
-  //       var dvi02 = $(doc).find("#thread_subject");
-  //       var magnet = $(dvi01).find("li").text();
-  //       $(icn_td).css("width", "100%");
-  //       $(icn_td).append(
-  //         "<p style='margin-top: 20px;font-size: 2em;'>" +
-  //           $(dvi02).html() +
-  //           "</p><br/>"
-  //       );
-  //       $(icn_td).append(
-  //         "<p style='margin-top: 20px;font-size: 2em;'>" + magnet + "</p><br/>"
-  //       );
-  //     },
-  //   });
-  // });
-
-  // other
-  // $(".common").each(function () {
-  //   $(this).remove();
-  // });
-  // $(".by").each(function () {
-  //   $(this).remove();
-  // });
-  // $(".num").each(function () {
-  //   $(this).remove();
-  // });
+  }
 });
