@@ -69,10 +69,10 @@ $(document).ready(function () {
 
   function getImgStyle() {
     if (isChinese()) {
-      return "width:800px;margin:1px;display:block;";
+      return "width:100%;margin:1px;display:block;";
     }
 
-    return "width:800px;margin:1px;display:block;";
+    return "width:100%;margin:1px;display:block;";
   }
 
   function getData(uri) {
