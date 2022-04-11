@@ -72,7 +72,7 @@ $(document).ready(function () {
       return "width:800px;margin:1px;display:block;";
     }
 
-    return "width:400px;margin:1px;display:block;";
+    return "width:800px;margin:1px;display:block;";
   }
 
   function getData(uri) {
