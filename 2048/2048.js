@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.8
+// @version      0.0.9
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://hjd2048.com/*
@@ -135,7 +135,11 @@
   function isUrlList() {
     var reg = /fid-[\d]+.html/g;
     var res = href.match(reg);
-    return res && href.match(reg).length > 0;
+
+    var reg2 = /thread\.php\?fid=[\d]+/g;
+    var res2 = href.match(reg2);
+
+    return (res && res.length > 0) || (res2 && res2.length > 0);
   }
   // 检查是否是帖子
   function isUrlDetail() {
@@ -168,9 +172,9 @@
   if (isUrlList() || href.indexOf("search.php") >= 0) {
     // other
     document.querySelector(".TOP_PD") &&
-    document.querySelector(".TOP_PD").remove();
+      document.querySelector(".TOP_PD").remove();
     document.querySelector(".TOP_PD2") &&
-    document.querySelector(".TOP_PD2").remove();
+      document.querySelector(".TOP_PD2").remove();
 
     let origin = document.location.origin;
     // 列表循环
@@ -252,6 +256,6 @@
     }
   } else {
     document.querySelector("#footer") &&
-    document.querySelector("#footer").remove();
+      document.querySelector("#footer").remove();
   }
 })();
