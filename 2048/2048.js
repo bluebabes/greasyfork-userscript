@@ -210,6 +210,17 @@
           },
           onload: function (result) {
             var doc = result.responseText;
+
+            // 查找 dataaps
+            var hrefs = $(doc).find(".tpc_content a");
+            for (let i = 0; i < hrefs.length; i++) {
+              const element = hrefs[i];
+              if (element.href.indexOf("dataaps") > 0) {
+                thattd.append(`<a style="color: red;" target="_blank" href="` + element.href + `">磁力链接</a>`);
+              }
+            };
+
+
             var imgs = $(doc).find(".tpc_content img"); // $(doc).find(".att_img > img");
 
             // utils.Log(debug, ["获取图片:", imgs.length]);
