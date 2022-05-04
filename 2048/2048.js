@@ -136,7 +136,7 @@
     var reg = /fid-[\d]+.html/g;
     var res = href.match(reg);
 
-    var reg2 = /thread\.php\?fid=[\d]+/g;
+    var reg2 = /thread\.php/g;
     var res2 = href.match(reg2);
 
     return (res && res.length > 0) || (res2 && res2.length > 0);
