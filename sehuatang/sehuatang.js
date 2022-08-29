@@ -47,20 +47,30 @@ $(document).ready(function () {
   function isUrlList() {
     var reg = /forum-[\d-]+.html/g;
     var res = href.match(reg);
-    return res && href.match(reg).length > 0;
+    return res && res.length > 0;
   }
   function isNum(str) {
     var reg = /[\d-]+/g;
     var res = str.match(reg);
-    return res && str.match(reg).length > 0;
+    return res && res.length > 0;
   }
   function isFirstPage(str) {
     var reg = /1-[\d-]+.html/g;
     var res = str.match(reg);
-    return res && str.match(reg).length > 0;
+    return res && res.length > 0;
   }
-  function isChinese(){
-    return href.indexOf("forum-103-") > 0
+  function isChinese() {
+    return href.indexOf("forum-103-") > 0;
+  }
+
+  function regGetNo(str) {
+    var reg = /[a-z0-9]{3,8}-[a-z0-9]{3,8}/i;
+    var res = str.match(reg);
+    if (res.length > 0) {
+      return res[0];
+    } else {
+      return "";
+    }
   }
 
   function UrlComplate(path) {
@@ -103,13 +113,11 @@ $(document).ready(function () {
 
   // 主业务逻辑
   if (isUrlList()) {
-
     //other
     var shows = document.querySelectorAll(".show-text");
     shows.forEach((show) => {
       show.remove();
-    })
-  
+    });
 
     var table = document.querySelector("#threadlisttableid");
     var trs = table.querySelectorAll("tr");
@@ -117,7 +125,7 @@ $(document).ready(function () {
       var tds = tr.querySelectorAll("td");
       tds.forEach((td) => {
         td.remove();
-      })
+      });
 
       var ths = tr.querySelectorAll("th");
       ths.forEach((th) => {
@@ -139,12 +147,14 @@ $(document).ready(function () {
             continue;
           }
 
+          // console.log(element.textContent, "element.textContent");
+
           getData(UrlComplate(hrefth))
             .then((data) => {
               var doc = new DOMParser().parseFromString(data, "text/html");
 
               // magnet
-              var magnets = []
+              var magnets = [];
               var magnetObjs = doc.querySelectorAll(".blockcode li");
               magnetObjs.forEach((ele) => {
                 magnets.push(ele.textContent);
@@ -161,10 +171,10 @@ $(document).ready(function () {
               imgs = utils.Unique(imgs);
 
               // chinese 特殊处理
-              if (isChinese()){
-                imgs = imgs.length > 0 ? [imgs[0]]: []
+              if (isChinese()) {
+                imgs = imgs.length > 0 ? [imgs[0]] : [];
               }
-              
+
               // 插入到 th 中
               imgs.forEach((src, index) => {
                 if (src && src.length > 10) {
@@ -173,20 +183,28 @@ $(document).ready(function () {
                   node["style"] = getImgStyle();
                   node.style.objectFit = "contain";
                   th.prepend(node);
-                  
+
                   // br
                   th.append(document.createElement("br"));
                 }
               });
-
-              th.append(document.createElement("br"));
-              magnets.forEach((mag,index)=>{
+          
+              magnets.forEach((mag, index) => {
                 const node = document.createElement("a");
-                node.href = mag
-                node.text = mag
+                node.href = mag;
+                node.text = mag;
                 th.append(node);
-              })
+                th.append(document.createElement("br"));
+              });
               th.append(document.createElement("br"));
+
+              // 增加 javbus 链接
+              const nodejavbus = document.createElement("a");
+              nodejavbus.target="_blank"
+              nodejavbus.href =
+                "https://javbus.com/" + regGetNo(element.textContent);
+              nodejavbus.text = regGetNo(element.textContent);
+              th.append(nodejavbus);
             })
             .catch((e) => {
               console.log(e);
