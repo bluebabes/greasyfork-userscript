@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.9
+// @version      0.0.10
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://hjd2048.com/*
@@ -151,7 +151,9 @@
     "請各位更換新的文宣",
     "外站图床推荐",
     "开放主题",
+    "威尼斯人",
     "同城兼职少妇",
+    "区发贴教程详解",
   ];
   function isBlackTitle(title) {
     if (!title) {
@@ -190,7 +192,7 @@
 
       // a的数量异常删除
       if (thattd.find("a").length > 5) {
-        that.remove();
+        // that.remove();
       }
 
       // 处理图片
