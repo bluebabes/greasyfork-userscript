@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.10
+// @version      0.0.11
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*.hjd2048.com/*
@@ -186,8 +186,19 @@
       var url = origin + "/2048/" + thatA.attr("href");
 
       var thattd = that.find("td:eq(1)");
+      var thattdTime = that.find("td:eq(2)"); // 时间
+
       if (href.indexOf("search.php") >= 0) {
         thattd = that.find("th:eq(0)");
+        thattdTime = that.find("th:eq(1)");
+      }
+
+      var trTime = thattdTime.find("div.f10:eq(0)").text();
+      // console.log("trTime",  trTime);
+      var todayTime = new Date().toLocaleDateString("en-CA");
+
+      if (trTime == todayTime ) {
+          that.css("background-color","beige");
       }
 
       // a的数量异常删除
