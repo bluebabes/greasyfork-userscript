@@ -27,6 +27,13 @@
       }
     }
 
+    // 获取日期
+    TimeGetDate(days = 0) {
+      var now = new Date();
+      now.setDate(now.getDate() - days)
+      return now.toLocaleDateString("en-CA");
+    }
+
     // 获取 cookies
     GetCookies() {
       var pairs = document.cookie.split(";");

@@ -195,10 +195,16 @@
 
       var trTime = thattdTime.find("div.f10:eq(0)").text();
       // console.log("trTime",  trTime);
-      var todayTime = new Date().toLocaleDateString("en-CA");
 
+      var todayDate = utils.TimeGetDate(0)
       if (trTime == todayTime ) {
-          that.css("background-color","beige");
+          that.css("background-color","#BC5367");
+      }
+      if (trTime == utils.TimeGetDate(-1) ) {
+          that.css("background-color","#CB7F8F");
+      }
+      if (trTime == utils.TimeGetDate(-2) ) {
+          that.css("background-color","#EFC5C4");
       }
 
       // a的数量异常删除
