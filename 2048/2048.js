@@ -194,7 +194,8 @@
       }
 
       var trTime = thattdTime.find("div.f10:eq(0)").text();
-      // console.log("trTime",  trTime);
+      
+      console.log("trTime",  trTime, "->", utils.TimeGetDate(0), utils.TimeGetDate(-1), utils.TimeGetDate(-2));
 
       var todayDate = utils.TimeGetDate(0)
       if (trTime == todayDate ) {
