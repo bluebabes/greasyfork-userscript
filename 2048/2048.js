@@ -197,7 +197,7 @@
       // console.log("trTime",  trTime);
 
       var todayDate = utils.TimeGetDate(0)
-      if (trTime == todayTime ) {
+      if (trTime == todayDate ) {
           that.css("background-color","#BC5367");
       }
       if (trTime == utils.TimeGetDate(-1) ) {
