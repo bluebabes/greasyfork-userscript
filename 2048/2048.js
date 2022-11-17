@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.11
+// @version      0.0.12
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*.hjd2048.com/*
@@ -9,7 +9,7 @@
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/2048/2048.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
-// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js?t=20220408
+// @require      https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/utils/utils.js?t=202204223
 // @grant        GM_xmlhttpRequest
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -194,18 +194,18 @@
       }
 
       var trTime = thattdTime.find("div.f10:eq(0)").text();
-      
-      console.log("trTime",  trTime, "->", utils.TimeGetDate(0), utils.TimeGetDate(-1), utils.TimeGetDate(-2));
+
+      // console.log("trTime",  trTime, "->", utils.TimeGetDate(0), utils.TimeGetDate(-1), utils.TimeGetDate(-2));
 
       var todayDate = utils.TimeGetDate(0)
       if (trTime == todayDate ) {
-          that.css("background-color","#BC5367");
+          that.css("background-color","#81C6E8");
       }
       if (trTime == utils.TimeGetDate(-1) ) {
-          that.css("background-color","#CB7F8F");
+          that.css("background-color","#E5EBB2");
       }
       if (trTime == utils.TimeGetDate(-2) ) {
-          that.css("background-color","#EFC5C4");
+          that.css("background-color","#F5EFE6");
       }
 
       // a的数量异常删除
