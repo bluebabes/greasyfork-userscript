@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sehuatang
 // @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
-// @version      0.0.6
+// @version      0.0.7
 // @author       bluebabes
 // @namespace    www.sehuatang.net
 // @include      https://www.sehuatang.net/forum-*
@@ -22,6 +22,7 @@ $(document).ready(function () {
     "最新永久访问本站",
     "新安卓发布",
     "二次验证丢失",
+    "高端约炮平台",
     "同样花钱",
     "想得到邀请码的进",
     "邀请码广告主题",
