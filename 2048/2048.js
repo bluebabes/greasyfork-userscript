@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.12
+// @version      0.0.13
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -158,6 +158,7 @@
     "开放主题",
     "威尼斯人",
     "同城兼职少妇",
+    "华人高端",
     "区发贴教程详解",
   ];
   function isBlackTitle(title) {
