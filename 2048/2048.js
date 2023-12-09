@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.13
+// @version      0.0.14
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -22,7 +22,7 @@
 (function () {
   "use strict";
   
-  if (document.title.indexOf('人人为我 我为人人') ===-1){
+  if (document.title.indexOf('人人 人人') ===-1){
       return
   }
   
@@ -263,7 +263,7 @@
               if (i == 0) {
                 thattd.append("<br />");
               }
-              var src = element.getAttribute("src");
+              var src = element.getAttribute("file");
               src = utils.ImgSrcComplate(src);
 
               thattd.append(
