@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.14
+// @version      0.0.15
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -263,7 +263,7 @@
               if (i == 0) {
                 thattd.append("<br />");
               }
-              var src = element.getAttribute("file");
+              var src = element.getAttribute("file") || element.getAttribute("src");
               src = utils.ImgSrcComplate(src);
 
               thattd.append(
