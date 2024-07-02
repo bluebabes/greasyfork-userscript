@@ -132,6 +132,8 @@
     const buyButton = document.querySelector("#read_tpc > div > input")
     if (buyButton) {
       buyButton.click()
+    } else {
+      GoBuyInfo()
     }
   }
 
