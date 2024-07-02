@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
-// @description  帖子高亮，列表页面直接预览帖子内图片
-// @version      0.0.16
+// @description  帖子高亮，列表页面直接预览帖子内图片, 更多功能查看readme
+// @version      0.0.17
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -22,8 +22,12 @@
 (function () {
   "use strict";
   
+  var isSite2048 = false
+
   if (document.title.indexOf('人人') ===-1){
       return
+  } else {
+      isSite2048 = true
   }
   
   $("head").append($(`<style></style>`));
@@ -32,8 +36,26 @@
   var debug = true;
   var maxImgCount = 8; // 最多显示图片数量
 
+
+  // 快捷键
+  document.addEventListener('keydown', function(e) {
+    // pressed ctrl+b 购买
+    if (e.key == "j" && e.ctrlKey) {
+     GoBuyInfo()
+    }
+    if (e.key == "b" && e.ctrlKey) {
+     GoBuy()
+    }
+    if (e.key == "t" && e.ctrlKey) {
+     GoTop()
+    }
+  }, false);
+
+
   // 增加菜单
-  var menu_ALL = [["menu_disable", "✅ 已启用", "❌ 已禁用", []]];
+  var menu_ALL = [
+    ["menu_disable", "✅ 已启用", "❌ 已禁用", []],
+  ];
   var menu_ID = [];
   for (let i = 0; i < menu_ALL.length; i++) {
     // 如果读取到的值为 null 就写入默认值
@@ -66,6 +88,8 @@
       }
     }
   }
+
+  // 反馈 & 建议
   menu_ID[menu_ID.length] = GM_registerMenuCommand(
     "💬 反馈 & 建议",
     function () {
@@ -79,6 +103,45 @@
       );
     }
   );
+
+  // 快速购买帖子
+  menu_ID.push(GM_registerMenuCommand(
+    "一键购买帖子(ctrl+b)",
+    function () {
+      GoBuy()
+    }
+  ))
+
+  // 跳转到购买信息
+  menu_ID.push(GM_registerMenuCommand(
+    "跳转到购买信息(ctrl+j)",
+    function () {
+      GoBuyInfo()
+    }
+  ))
+  
+  // 跳转到顶部
+  menu_ID.push(GM_registerMenuCommand(
+    "跳转到顶部(ctrl+t)",
+    function () {
+      GoTop()
+    }
+  ))
+
+  function GoBuy(){
+    const buyButton = document.querySelector("#read_tpc > div > input")
+    if (buyButton) {
+      buyButton.click()
+    }
+  }
+
+  function GoBuyInfo(){
+    const element=document.getElementById('read_tpc').querySelector('div span');if(element){element.scrollIntoView({})}else{console.error('Element not found')}
+  }
+  function GoTop(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
 
   // 返回菜单值
   function menu_value(menuName) {
@@ -298,4 +361,30 @@
     document.querySelector("#footer") &&
       document.querySelector("#footer").remove();
   }
+
+
+  // 创建 MutationObserver 来监视URL变化
+  //const mutationObserver = new MutationObserver(() => {
+  //  const currentURL = document.URL;
+    //if (currentURL.includes('https://www-example-com.cdn.ampproject.org/c/s/www.example.com')) {
+      // 如果在目标网站上，则启用快捷键
+    //   if (!shortcutEnabled) {
+    //     GM_hotkey('Ctrl+Shift+S', yourShortcutKeyFunction); // 用您想要的快捷键组合替换
+    //     shortcutEnabled = true;
+    //     console.log("Shortcut key enabled for https://www-example-com.cdn.ampproject.org/c/s/www.example.com");
+    //   }
+    // } else {
+      // // 如果不在目标网站上，则禁用快捷键
+      // if (shortcutEnabled) {
+      //   GM_hotkey.unregister('Ctrl+Shift+S'); // 用您想要的快捷键组合替换
+      //   shortcutEnabled = false;
+      //   console.log("Shortcut key disabled");
+      // }
+   // }
+  //});
+
+  // 开始观察URL变化
+  // mutationObserver.observe(document, { attributes: true, attributeFilter: ['href'] });
+
+
 })();
