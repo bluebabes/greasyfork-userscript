@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片, 更多功能查看readme
-// @version      0.0.17
+// @version      0.0.18
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -141,7 +141,21 @@
   }
 
   function GoBuyInfo(){
-    const element=document.getElementById('read_tpc').querySelector('div span');if(element){element.scrollIntoView({})}else{console.error('Element not found')}
+    const element = document.getElementById('read_tpc').querySelector('div span');
+    if(element){
+      element.scrollIntoView({})
+    }else{
+      console.error('Element not found')
+      // r_one
+
+      var rones = document.querySelectorAll(".r_one")
+      if (rones.length >= 1 ) {
+        const att = rones[1];
+        if(att){
+          att.scrollIntoView({})
+        }
+      }
+    }
   }
   function GoTop(){
     window.scrollTo({ top: 0, behavior: 'smooth' });
