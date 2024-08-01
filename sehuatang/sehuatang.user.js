@@ -23,16 +23,19 @@ $(document).ready(function () {
     "新安卓发布",
     "二次验证丢失",
     "高端约炮平台",
+      "突破河南",
     "同样花钱",
     "想得到邀请码的进",
     "邀请码广告主题",
     "本站方法和安卓",
+    "PC发布器",
     "大家下载反馈",
   ];
   function isBlackTitle(title) {
     if (!title) {
       return true;
     }
+
     var isBlack = false;
     for (let i = 0; i < filters.length; i++) {
       const element = filters[i];
@@ -80,10 +83,10 @@ $(document).ready(function () {
 
   function getImgStyle() {
     if (isChinese()) {
-      return "width:450px;margin:1px;display:block;";
+      return "width:450px;margin:1px;display:block;float:left;";
     }
 
-    return "width:450px;margin:1px;display:block;";
+    return "width:450px;margin:1px;display:block;float:left;";
   }
 
   function getData(uri) {
@@ -137,17 +140,18 @@ $(document).ready(function () {
 
 
           if (
-            hrefth.indexOf("javascript") >= 0
+            hrefth.indexOf("javascript") >= 0 ||
+              i <= 1
           ) {
             continue;
           }
 
           // 黑名单
           if (isBlackTitle(element.textContent)) {
-            continue;
+            break;
           }
 
-          console.log(element.textContent, "element.textContent",  hrefth);
+          //console.log("index",i, element.textContent,    hrefth,UrlComplate(hrefth));
 
           getData(UrlComplate(hrefth))
             .then((data) => {
@@ -189,6 +193,8 @@ $(document).ready(function () {
                 }
               });
 
+              th.append(document.createElement("br"));
+
               magnets.forEach((mag, index) => {
                 const node = document.createElement("a");
                 node.href = mag;
@@ -209,6 +215,8 @@ $(document).ready(function () {
             .catch((e) => {
               console.log(e);
             });
+
+            break;
         }
       });
     });
