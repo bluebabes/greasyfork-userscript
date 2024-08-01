@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         98堂
 // @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
-// @version      0.0.8
+// @version      0.0.9
 // @author       bluebabes
 // @namespace    www.sehuatang.net
 // @include      https://www.sehuatang.net/forum-*
@@ -23,7 +23,7 @@ $(document).ready(function () {
     "新安卓发布",
     "二次验证丢失",
     "高端约炮平台",
-      "突破河南",
+    "突破河南",
     "同样花钱",
     "想得到邀请码的进",
     "邀请码广告主题",
@@ -83,10 +83,10 @@ $(document).ready(function () {
 
   function getImgStyle() {
     if (isChinese()) {
-      return "width:450px;margin:1px;display:block;float:left;";
+      return "width:456px;margin:1px;display:block;float:left;";
     }
 
-    return "width:450px;margin:1px;display:block;float:left;";
+    return "width:456px;margin:1px;display:block;float:left;";
   }
 
   function getData(uri) {
