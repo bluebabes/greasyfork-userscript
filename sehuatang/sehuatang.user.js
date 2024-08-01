@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         sehuatang
+// @name         98堂
 // @description  直接把帖子列表转成图片浏览,点击图片可以进入帖子.
-// @version      0.0.7
+// @version      0.0.8
 // @author       bluebabes
 // @namespace    www.sehuatang.net
 // @include      https://www.sehuatang.net/forum-*
-// @include      https://www.sehuatang.net/forum.php?mod=forumdisplay&fid=103&page=*
+// @include      https://www.sehuatang.net/forum.php*
 // @updateURL    https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
 // @downloadURL  https://raw.githubusercontent.com/bluebabes/greasyfork-userscript/main/sehuatang/sehuatang.js
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
@@ -46,7 +46,7 @@ $(document).ready(function () {
 
   // 检查是否是列表
   function isUrlList() {
-    var reg = /forum-[\d-]+.html/g;
+    var reg = /sehuatang.net\/forum/g;
     var res = href.match(reg);
     return res && res.length > 0;
   }
@@ -67,7 +67,7 @@ $(document).ready(function () {
   function regGetNo(str) {
     var reg = /[a-z0-9]{3,8}-[a-z0-9]{3,8}/i;
     var res = str.match(reg);
-    if (res.length > 0) {
+    if (res && res.length > 0) {
       return res[0];
     } else {
       return "";
@@ -80,10 +80,10 @@ $(document).ready(function () {
 
   function getImgStyle() {
     if (isChinese()) {
-      return "width:100%;margin:1px;display:block;";
+      return "width:450px;margin:1px;display:block;";
     }
 
-    return "width:100%;margin:1px;display:block;";
+    return "width:450px;margin:1px;display:block;";
   }
 
   function getData(uri) {
@@ -134,11 +134,10 @@ $(document).ready(function () {
         for (let i = 0; i < as.length; i++) {
           const element = as[i];
           var hrefth = element.getAttribute("href");
+
+
           if (
-            hrefth.indexOf("javascript") >= 0 ||
-            hrefth.indexOf("typeid=") >= 0 ||
-            hrefth.indexOf("announcement") >= 0 ||
-            !isFirstPage(hrefth)
+            hrefth.indexOf("javascript") >= 0
           ) {
             continue;
           }
@@ -148,7 +147,7 @@ $(document).ready(function () {
             continue;
           }
 
-          // console.log(element.textContent, "element.textContent");
+          console.log(element.textContent, "element.textContent",  hrefth);
 
           getData(UrlComplate(hrefth))
             .then((data) => {
@@ -189,7 +188,7 @@ $(document).ready(function () {
                   th.append(document.createElement("br"));
                 }
               });
-          
+
               magnets.forEach((mag, index) => {
                 const node = document.createElement("a");
                 node.href = mag;
