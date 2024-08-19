@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片, 更多功能查看readme
-// @version      0.0.18
+// @version      0.0.19
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -26,6 +26,7 @@
   "use strict";
   
   var isSite2048 = false
+  var siteUrl = "" // 用于自定义
 
   if (document.title.indexOf('人人') ===-1){
       return
@@ -271,7 +272,11 @@
     $(".tr3").each(function () {
       var that = $(this);
       var thatA = that.find("a").first();
+      
       var url = origin + "/2048/" + thatA.attr("href");
+      if (siteUrl.length >= 0) {
+        url = siteUrl + thatA.attr("href");
+      }
 
       var thattd = that.find("td:eq(1)");
       var thattdTime = that.find("td:eq(2)"); // 时间
