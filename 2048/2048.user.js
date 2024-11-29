@@ -313,8 +313,9 @@
         // that.remove();
       }
 
+        console.log(thattd[0])
       // 处理图片
-      var title = thattd[0].textContent;
+      var title = thattd[0] && thattd[0].textContent || "";
       var isBlacked = isBlackTitle(title);
       if (!isBlacked && !menu_disable("check")) {
         utils.Log(debug, ["处理内部帖子图片:", title, url]);
