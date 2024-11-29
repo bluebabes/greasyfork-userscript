@@ -235,6 +235,8 @@
   }
   // 过滤
   var filters = [
+     "安卓+iOS",
+    "最新破解",
     "來訪者必看的內容",
     "請各位更換新的文宣",
     "外站图床推荐",
@@ -242,7 +244,12 @@
     "威尼斯人",
     "同城兼职少妇",
     "华人高端",
+      "在线影片超百万",
+     "解锁会员",
     "区发贴教程详解",
+      "任意资源",
+      "加速器",
+      "VIP会员路线",
   ];
   function isBlackTitle(title) {
     if (!title) {
@@ -307,7 +314,7 @@
       }
 
       // 处理图片
-      var title = thattd.find("a").first().text();
+      var title = thattd[0].textContent;
       var isBlacked = isBlackTitle(title);
       if (!isBlacked && !menu_disable("check")) {
         utils.Log(debug, ["处理内部帖子图片:", title, url]);
