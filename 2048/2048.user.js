@@ -24,16 +24,16 @@
 
 (function () {
   "use strict";
-  
+
   var isSite2048 = false
   var siteUrl = "https://goto.rose2099-c.workers.dev/proxy/https://2048.cc/2048/" // 用于自定义
 
-  if (document.title.indexOf('人人') ===-1){
-      return
+  if (document.title.indexOf('人人') === -1) {
+    return
   } else {
-      isSite2048 = true
+    isSite2048 = true
   }
-  
+
   $("head").append($(`<style></style>`));
 
   // debug
@@ -42,16 +42,16 @@
 
 
   // 快捷键
-  document.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function (e) {
     // pressed ctrl+b 购买
     if (e.key == "j" && e.ctrlKey) {
-     GoBuyInfo()
+      GoBuyInfo()
     }
     if (e.key == "b" && e.ctrlKey) {
-     GoBuy()
+      GoBuy()
     }
     if (e.key == "t" && e.ctrlKey) {
-     GoTop()
+      GoTop()
     }
   }, false);
 
@@ -59,6 +59,7 @@
   // 增加菜单
   var menu_ALL = [
     ["menu_disable", "✅ 已启用", "❌ 已禁用", []],
+    ["mili_disable", "已关闭米粒贴", "已打开米粒贴", false],
   ];
   var menu_ID = [];
   for (let i = 0; i < menu_ALL.length; i++) {
@@ -91,6 +92,29 @@
         });
       }
     }
+
+
+    // 米粒
+    if (menu_ALL[i][0] === "mili_disable") {
+
+      let isOn = menu_value("mili_disable");
+      if (isOn) {
+        menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][2]}`, function () {
+          // 已禁用
+          GM_setValue("mili_disable", false); // 写入配置
+          location.reload(); // 刷新网页
+        });
+        return;
+      } else {
+        // 开启状态
+        menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][1]}`, function () {
+          // 开启状态
+          GM_setValue("mili_disable", true); // 写入配置
+          location.reload(); // 刷新网页
+        });
+      }
+    }
+
   }
 
   // 反馈 & 建议
@@ -123,7 +147,7 @@
       GoBuyInfo()
     }
   ))
-  
+
   // 跳转到顶部
   menu_ID.push(GM_registerMenuCommand(
     "跳转到顶部(ctrl+t)",
@@ -132,7 +156,7 @@
     }
   ))
 
-  function GoBuy(){
+  function GoBuy() {
     const buyButton = document.querySelector("#read_tpc > div > input")
     if (buyButton) {
       buyButton.click()
@@ -141,24 +165,24 @@
     }
   }
 
-  function GoBuyInfo(){
+  function GoBuyInfo() {
     const element = document.getElementById('read_tpc').querySelector('div span');
-    if(element){
+    if (element) {
       element.scrollIntoView({})
-    }else{
+    } else {
       console.error('Element not found')
       // r_one
 
       var rones = document.querySelectorAll(".r_one")
-      if (rones.length >= 1 ) {
+      if (rones.length >= 1) {
         const att = rones[1];
-        if(att){
+        if (att) {
           att.scrollIntoView({})
         }
       }
     }
   }
-  function GoTop(){
+  function GoTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -235,28 +259,28 @@
   }
   // 过滤
   var filters = [
-     "安卓+iOS",
+    "安卓+iOS",
     "最新破解",
     "來訪者必看的內容",
     "請各位更換新的文宣",
     "外站图床推荐",
     "开放主题",
     "威尼斯人",
-      "AI去衣",
-       "AI绘",
-      "Generated",
-            "AI绘图",
-      "AI动漫",
-      "ai明星",
+    "AI去衣",
+    "AI绘",
+    "Generated",
+    "AI绘图",
+    "AI动漫",
+    "ai明星",
     "同城兼职少妇",
-      "ai精品",
+    "ai精品",
     "华人高端",
-      "在线影片超百万",
-     "解锁会员",
+    "在线影片超百万",
+    "解锁会员",
     "区发贴教程详解",
-      "任意资源",
-      "加速器",
-      "VIP会员路线",
+    "任意资源",
+    "加速器",
+    "VIP会员路线",
   ];
   function isBlackTitle(title) {
     if (!title) {
@@ -286,7 +310,7 @@
     $(".tr3").each(function () {
       var that = $(this);
       var thatA = that.find("a").first();
-      
+
       var url = origin + "/2048/" + thatA.attr("href");
       if (siteUrl.length >= 0) {
         url = siteUrl + thatA.attr("href");
@@ -294,7 +318,6 @@
 
       var thattd = that.find("td:eq(1)");
       var thattdTime = that.find("td:eq(2)"); // 时间
-
       if (href.indexOf("search.php") >= 0) {
         thattd = that.find("th:eq(0)");
         thattdTime = that.find("th:eq(1)");
@@ -305,14 +328,14 @@
       // console.log("trTime",  trTime, "->", utils.TimeGetDate(0), utils.TimeGetDate(-1), utils.TimeGetDate(-2));
 
       var todayDate = utils.TimeGetDate(0)
-      if (trTime == todayDate ) {
-          that.css("background-color","#81C6E8");
+      if (trTime == todayDate) {
+        that.css("background-color", "#81C6E8");
       }
-      if (trTime == utils.TimeGetDate(-1) ) {
-          that.css("background-color","#E5EBB2");
+      if (trTime == utils.TimeGetDate(-1)) {
+        that.css("background-color", "#E5EBB2");
       }
-      if (trTime == utils.TimeGetDate(-2) ) {
-          that.css("background-color","#F5EFE6");
+      if (trTime == utils.TimeGetDate(-2)) {
+        that.css("background-color", "#F5EFE6");
       }
 
       // a的数量异常删除
@@ -320,7 +343,7 @@
         // that.remove();
       }
 
-        console.log(thattd[0])
+      console.log(thattd[0])
       // 处理图片
       var title = thattd[0] && thattd[0].textContent || "";
       var isBlacked = isBlackTitle(title);
@@ -339,6 +362,8 @@
           onload: function (result) {
             var doc = result.responseText;
 
+
+
             // 查找 dataaps
             var hrefs = $(doc).find(".tpc_content a");
             for (let i = 0; i < hrefs.length; i++) {
@@ -346,11 +371,53 @@
               if (element.href.indexOf("dataaps") > 0) {
                 thattd.append(
                   `<a style="color: red;" target="_blank" href="` +
-                    element.href +
-                    `">磁力链接</a>`
+                  element.href +
+                  `">磁力链接</a>`
                 );
               }
             }
+
+
+            // pan.baidu
+
+            if (document.body.textContent.includes("pan.baidu.com")) {
+              thattd.append(
+                `<font  style="color: blue;font-size: 25px;
+    background-color: blanchedalmond;" >` + 百度盘 + `<font />`
+              );
+            }
+
+            // 已购买
+            let findhiddex = $(doc).find(".hidden-box")
+            if (findhiddex && findhiddex.length > 0) {
+              thattd.append(
+                `<font  style="color: red;font-size: 25px;
+    background-color: blanchedalmond;" >` + "已购买" + `<font />`
+              );
+            }
+
+            // coin
+            // console.log(GM_getValue("mili_disable"), "mili_disable")
+            var coins = $(doc).find(".coin");
+            for (let i = 0; i < coins.length; i++) {
+              const coin = coins[i];
+              if (coin) {
+
+                // 米粒贴 过滤
+                if (GM_getValue("mili_disable") == false && coin.textContent.indexOf("米粒") >= 0) {
+                  thattd.parent().remove();
+                  return
+                }
+                thattd.prepend(
+                  `<font id="coin" style="color: red;font-size: 25px;
+    background-color: blanchedalmond;" >` + coin.textContent + `<font />`
+                );
+              }
+            }
+
+
+
+
 
             var imgs = $(doc).find(".tpc_content img"); // $(doc).find(".att_img > img");
 
@@ -370,10 +437,12 @@
 
               thattd.append(
                 "<img object-fit='contain' style='width:200px;' src='" +
-                  src +
-                  "' />"
+                src +
+                "' />"
               );
             }
+
+
           },
         });
       }
@@ -405,21 +474,21 @@
   // 创建 MutationObserver 来监视URL变化
   //const mutationObserver = new MutationObserver(() => {
   //  const currentURL = document.URL;
-    //if (currentURL.includes('https://www-example-com.cdn.ampproject.org/c/s/www.example.com')) {
-      // 如果在目标网站上，则启用快捷键
-    //   if (!shortcutEnabled) {
-    //     GM_hotkey('Ctrl+Shift+S', yourShortcutKeyFunction); // 用您想要的快捷键组合替换
-    //     shortcutEnabled = true;
-    //     console.log("Shortcut key enabled for https://www-example-com.cdn.ampproject.org/c/s/www.example.com");
-    //   }
-    // } else {
-      // // 如果不在目标网站上，则禁用快捷键
-      // if (shortcutEnabled) {
-      //   GM_hotkey.unregister('Ctrl+Shift+S'); // 用您想要的快捷键组合替换
-      //   shortcutEnabled = false;
-      //   console.log("Shortcut key disabled");
-      // }
-   // }
+  //if (currentURL.includes('https://www-example-com.cdn.ampproject.org/c/s/www.example.com')) {
+  // 如果在目标网站上，则启用快捷键
+  //   if (!shortcutEnabled) {
+  //     GM_hotkey('Ctrl+Shift+S', yourShortcutKeyFunction); // 用您想要的快捷键组合替换
+  //     shortcutEnabled = true;
+  //     console.log("Shortcut key enabled for https://www-example-com.cdn.ampproject.org/c/s/www.example.com");
+  //   }
+  // } else {
+  // // 如果不在目标网站上，则禁用快捷键
+  // if (shortcutEnabled) {
+  //   GM_hotkey.unregister('Ctrl+Shift+S'); // 用您想要的快捷键组合替换
+  //   shortcutEnabled = false;
+  //   console.log("Shortcut key disabled");
+  // }
+  // }
   //});
 
   // 开始观察URL变化
