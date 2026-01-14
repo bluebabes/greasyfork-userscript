@@ -34,6 +34,10 @@
     isSite2048 = true
   }
 
+  const filterName = [
+    "优质图片"
+  ]
+
   $("head").append($(`<style></style>`));
 
   // debug
@@ -257,8 +261,11 @@
   function isUrlDetail() {
     return !isUrlList;
   }
+
+
+
   // 过滤
-  var filters = [
+  const filters = [
     "安卓+iOS",
     "最新破解",
     "來訪者必看的內容",
@@ -298,177 +305,156 @@
   }
 
   // 2048 列表逻辑处理
-  if (isUrlList() || href.indexOf("search.php") >= 0) {
-    // other
-    document.querySelector(".TOP_PD") &&
-      document.querySelector(".TOP_PD").remove();
-    document.querySelector(".TOP_PD2") &&
-      document.querySelector(".TOP_PD2").remove();
+if (isUrlList() || href.indexOf("search.php") >= 0) {
+    // 移除广告/冗余元素
+    document.querySelectorAll(".TOP_PD, .TOP_PD2").forEach(el => el.remove());
 
     let origin = document.location.origin;
-    // 列表循环
-    $(".tr3").each(function () {
-      var that = $(this);
-      var thatA = that.find("a").first();
 
-      var url = origin + "/2048/" + thatA.attr("href");
-      if (siteUrl.length >= 0) {
-        url = siteUrl + thatA.attr("href");
-      }
+    // 列表循环：将 $(".tr3") 改为 querySelectorAll
+    document.querySelectorAll(".tr3").forEach(function (that) {
+        var thatA = that.querySelector("a"); // 获取第一个 a 标签
+        if (!thatA) return;
 
-      var thattd = that.find("td:eq(1)");
-      var thattdTime = that.find("td:eq(2)"); // 时间
-      if (href.indexOf("search.php") >= 0) {
-        thattd = that.find("th:eq(0)");
-        thattdTime = that.find("th:eq(1)");
-      }
+        var hrefAttr = thatA.getAttribute("href");
+        var url = origin + "/2048/" + hrefAttr;
+        if (typeof siteUrl !== "undefined" && siteUrl.length >= 0) {
+            url = siteUrl + hrefAttr;
+        }
 
-      var trTime = thattdTime.find("div.f10:eq(0)").text();
+        // 默认取值逻辑
+        var tds = that.querySelectorAll("td");
+        var thattd = tds[1];
+        var thattdTime = tds[2]; // 时间容器
+        var siteName = "";
 
-      // console.log("trTime",  trTime, "->", utils.TimeGetDate(0), utils.TimeGetDate(-1), utils.TimeGetDate(-2));
-
-      var todayDate = utils.TimeGetDate(0)
-      if (trTime == todayDate) {
-        that.css("background-color", "#81C6E8");
-      }
-      if (trTime == utils.TimeGetDate(-1)) {
-        that.css("background-color", "#E5EBB2");
-      }
-      if (trTime == utils.TimeGetDate(-2)) {
-        that.css("background-color", "#F5EFE6");
-      }
-
-      // a的数量异常删除
-      if (thattd.find("a").length > 5) {
-        // that.remove();
-      }
-
-      console.log(thattd[0])
-      // 处理图片
-      var title = thattd[0] && thattd[0].textContent || "";
-      var isBlacked = isBlackTitle(title);
-      if (!isBlacked && !menu_disable("check")) {
-        utils.Log(debug, ["处理内部帖子图片:", title, url]);
-        GM_xmlhttpRequest({
-          method: "GET",
-          url: url,
-          headers: {
-            "User-agent": window.navigator.userAgent,
-            Accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            cookie: document.cookie,
-            referer: href,
-          },
-          onload: function (result) {
-            var doc = result.responseText;
-
-
-
-            // 查找 dataaps
-            var hrefs = $(doc).find(".tpc_content a");
-            for (let i = 0; i < hrefs.length; i++) {
-              const element = hrefs[i];
-              if (element.href.indexOf("dataaps") > 0) {
-                thattd.append(
-                  `<a style="color: red;" target="_blank" href="` +
-                  element.href +
-                  `">磁力链接</a>`
-                );
-              }
+        // 特殊处理 search.php 逻辑
+        if (href.indexOf("search.php") >= 0) {
+            thattd = that.querySelector("th"); // search.php 中标题通常在 th
+            // 时间通常在第二个 td
+            if (tds[1]) {
+                thattdTime = tds[1];
+                var rawTimeText = tds[1].textContent.replace(/\n/g, "").replace("我为人人", "");
+                // 注意：这里需要根据 search.php 实际结构调整
+                siteName = tds[0].textContent.replace(/\n/g, "");
             }
+        }
+
+        if (filterName.indexOf(siteName) >= 0) {
+          that.remove();
+          return;
+        }
 
 
-            // pan.baidu
+        console.log(siteName, "siteName");
 
-            if (document.body.textContent.includes("pan.baidu.com")) {
-              thattd.append(
-                `<font  style="color: blue;font-size: 25px;
-    background-color: blanchedalmond;" >` + 百度盘 + `<font />`
-              );
-            }
+        // 获取时间文本：对应 jQuery 的 find("div.f10:eq(0)")
+        var timeDiv = thattdTime ? thattdTime.querySelector("div.f10") : null;
+        var trTime = timeDiv ? timeDiv.textContent.trim() : "";
 
-            // 已购买
-            let findhiddex = $(doc).find(".hidden-box")
-            if (findhiddex && findhiddex.length > 0) {
-              thattd.append(
-                `<font  style="color: red;font-size: 25px;
-    background-color: blanchedalmond;" >` + "已购买" + `<font />`
-              );
-            }
+        // 背景颜色处理
+        var todayDate = utils.TimeGetDate(0);
+        if (trTime === todayDate) {
+            that.style.backgroundColor = "#81C6E8";
+        } else if (trTime === utils.TimeGetDate(-1)) {
+            that.style.backgroundColor = "#E5EBB2";
+        } else if (trTime === utils.TimeGetDate(-2)) {
+            that.style.backgroundColor = "#F5EFE6";
+        }
 
-            // coin
-            // console.log(GM_getValue("mili_disable"), "mili_disable")
-            var coins = $(doc).find(".coin");
-            for (let i = 0; i < coins.length; i++) {
-              const coin = coins[i];
-              if (coin) {
+        // 处理内部帖子图片和内容
+        var title = thattd ? thattd.textContent.trim() : "";
+        var isBlacked = isBlackTitle(title);
 
-                // 米粒贴 过滤
-                if (GM_getValue("mili_disable") == false && coin.textContent.indexOf("米粒") >= 0) {
-                  thattd.parent().remove();
-                  return
-                }
-                thattd.prepend(
-                  `<font id="coin" style="color: red;font-size: 25px;
-    background-color: blanchedalmond;" >` + coin.textContent + `<font />`
-                );
-              }
-            }
+        if (!isBlacked && !menu_disable("check")) {
+            utils.Log(debug, ["处理内部帖子图片:", title, url]);
 
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: url,
+                headers: {
+                    "User-agent": window.navigator.userAgent,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                    "cookie": document.cookie,
+                    "referer": href,
+                },
+                onload: function (result) {
+                    // 使用 DOMParser 解析返回的字符串
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(result.responseText, "text/html");
 
+                    // 1. 查找 dataaps (磁力链接)
+                    var hrefs = doc.querySelectorAll(".tpc_content a");
+                    hrefs.forEach(element => {
+                        if (element.href.indexOf("dataaps") > 0) {
+                            thattd.insertAdjacentHTML('beforeend',
+                                `<a style="color: red;" target="_blank" href="${element.href}">磁力链接</a>`
+                            );
+                        }
+                    });
 
+                    // 2. 百度盘判断
+                    if (doc.body.textContent.includes("pan.baidu.com")) {
+                        thattd.insertAdjacentHTML('beforeend',
+                            `<font style="color: blue; font-size: 25px; background-color: blanchedalmond;">百度盘</font>`
+                        );
+                    }
 
+                    // 3. 查找 coin (米粒)
+                    var coins = doc.querySelectorAll(".coin");
+                    for (let coin of coins) {
+                        if (GM_getValue("mili_disable") === false && coin.textContent.includes("米粒")) {
+                            that.remove(); // 移除整行
+                            return;
+                        }
+                        thattd.insertAdjacentHTML('afterbegin',
+                            `<font style="color: red; font-size: 25px; background-color: blanchedalmond;">${coin.textContent}</font>`
+                        );
+                    }
 
-            var imgs = $(doc).find(".tpc_content img"); // $(doc).find(".att_img > img");
+                    // 4. 查找 hidden-box
+                    if (doc.querySelector(".hidden-box")) {
+                        thattd.insertAdjacentHTML('beforeend',
+                            `<font style="color: red; font-size: 25px; background-color: blanchedalmond;">已购买</font>`
+                        );
+                    }
 
-            // utils.Log(debug, ["获取图片:", imgs.length]);
+                    // 5. 处理图片
+                    var imgs = doc.querySelectorAll(".tpc_content img");
+                    if (imgs.length > 0) {
+                        thattd.insertAdjacentHTML('beforeend', "<br />");
+                    }
+                    for (let i = 0; i < Math.min(imgs.length, maxImgCount); i++) {
+                        let img = imgs[i];
+                        var src = img.getAttribute("file") || img.getAttribute("data-original") || img.getAttribute("src");
+                        src = utils.ImgSrcComplate(src);
 
-            for (let i = 0; i < imgs.length; i++) {
-              // 最多图片
-              if (i >= maxImgCount) {
-                break;
-              }
-              const element = imgs[i];
-              if (i == 0) {
-                thattd.append("<br />");
-              }
-              var src = element.getAttribute("file") || element.getAttribute("data-original") || element.getAttribute("src");
-              src = utils.ImgSrcComplate(src);
-
-              thattd.append(
-                "<img object-fit='contain' style='width:200px;' src='" +
-                src +
-                "' />"
-              );
-            }
-
-
-          },
-        });
-      }
+                        let newImg = document.createElement("img");
+                        newImg.style.width = "200px";
+                        newImg.style.objectFit = "contain";
+                        newImg.src = src;
+                        thattd.appendChild(newImg);
+                    }
+                },
+            });
+        }
     });
 
-    // 高亮回复数大于xx数的帖子
+    // 高亮函数
     function highlight() {
-      var highlightCount = 5;
-      var tr3s = document.querySelectorAll(".tr3");
-      for (var i = 0; i < tr3s.length; i++) {
-        var element = tr3s[i];
-        var td = element.querySelectorAll("td");
-
-        // 高亮
-        if (td[3]) {
-          if (td[3].textContent * 1 > highlightCount) {
-            td[1].style.backgroundColor = "#baccd9";
-            td[3].style.backgroundColor = "#baccd9";
-          }
-        }
-      }
+        var highlightCount = 5;
+        document.querySelectorAll(".tr3").forEach(element => {
+            var tds = element.querySelectorAll("td");
+            if (tds[3] && (parseFloat(tds[3].textContent) > highlightCount)) {
+                if (tds[1]) tds[1].style.backgroundColor = "#baccd9";
+                tds[3].style.backgroundColor = "#baccd9";
+            }
+        });
     }
-  } else {
-    document.querySelector("#footer") &&
-      document.querySelector("#footer").remove();
-  }
+} else {
+    var footer = document.querySelector("#footer");
+    if (footer) footer.remove();
+}
 
 
   // 创建 MutationObserver 来监视URL变化
