@@ -34,6 +34,7 @@
     isSite2048 = true
   }
 
+  // 搜索移除板块，自己加板块名字 "优质图片", "E D 2 K"
   const filterName = [
     "优质图片"
   ]
