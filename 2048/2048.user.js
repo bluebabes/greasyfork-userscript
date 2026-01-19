@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片, 更多功能查看readme
-// @version      0.1.2
+// @version      0.1.3
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -34,9 +34,8 @@
     isSite2048 = true
   }
 
-  // 搜索移除板块，自己加板块名字 "优质图片", "E D 2 K"
   const filterName = [
-    "优质图片"
+    "优质图片", "E D 2 K","赚米专区","國內原創","求片专版","实时ＢＴ","网盘三区","明星合成","游戏下载","唯美清純"
   ]
 
   $("head").append($(`<style></style>`));
@@ -307,6 +306,23 @@
 
   // 2048 列表逻辑处理
 if (isUrlList() || href.indexOf("search.php") >= 0) {
+
+    // 自动搜索
+    const inputs = document.querySelectorAll("#keyword");
+    let realValue = "";
+    inputs.forEach(input => {
+        if (input.value) {
+            realValue = input.value;
+            console.log("搜索值：", realValue)
+            if (document.querySelectorAll(".pages").length == 0 ) {
+                document.querySelector(".search-btn").click();
+                console.log("自动搜索",realValue );
+            }
+        }
+    });
+
+
+
     // 移除广告/冗余元素
     document.querySelectorAll(".TOP_PD, .TOP_PD2").forEach(el => el.remove());
 
@@ -341,13 +357,15 @@ if (isUrlList() || href.indexOf("search.php") >= 0) {
             }
         }
 
+         console.log("siteName",siteName);
         if (filterName.indexOf(siteName) >= 0) {
+          console.log("移除",siteName);
           that.remove();
           return;
         }
 
 
-        console.log(siteName, "siteName");
+       
 
         // 获取时间文本：对应 jQuery 的 find("div.f10:eq(0)")
         var timeDiv = thattdTime ? thattdTime.querySelector("div.f10") : null;
@@ -405,6 +423,7 @@ if (isUrlList() || href.indexOf("search.php") >= 0) {
                     var coins = doc.querySelectorAll(".coin");
                     for (let coin of coins) {
                         if (GM_getValue("mili_disable") === false && coin.textContent.includes("米粒")) {
+                            console.log("移除","米粒帖子");
                             that.remove(); // 移除整行
                             return;
                         }
