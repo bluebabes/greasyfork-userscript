@@ -26,7 +26,8 @@
   "use strict";
 
   var isSite2048 = false
-  var siteUrl = "https://goto.rose2099-c.workers.dev/proxy/https://2048.cc/2048/" // 用于自定义
+  // var siteUrl = "https://goto.rose2099-c.workers.dev/proxy/https://2048.cc/2048/" // 用于自定义
+  var siteUrl = ""
 
   if (document.title.indexOf('人人') === -1) {
     return
