@@ -35,7 +35,7 @@
   }
 
   const filterName = [
-    "优质图片", "E D 2 K","赚米专区","國內原創","求片专版","实时ＢＴ","网盘三区","明星合成","游戏下载","唯美清純"
+    "优质图片", "E D 2 K","赚米专区","國內原創","求片专版","实时ＢＴ","网盘三区","明星合成","游戏下载","唯美清純","图你所图"
   ]
 
   $("head").append($(`<style></style>`));
@@ -315,8 +315,17 @@ if (isUrlList() || href.indexOf("search.php") >= 0) {
             realValue = input.value;
             console.log("搜索值：", realValue)
             if (document.querySelectorAll(".pages").length == 0 ) {
-                document.querySelector(".search-btn").click();
-                console.log("自动搜索",realValue );
+
+                var last_search_value = GM_getValue("last_search");
+
+                if (last_search_value != realValue) {
+                    GM_setValue("last_search", realValue)
+                    document.querySelector(".search-btn").click();
+                    console.log("自动搜索",realValue);
+
+                }
+
+             
             }
         }
     });
