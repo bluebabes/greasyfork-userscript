@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2048帖子高亮图片预览
 // @description  帖子高亮，列表页面直接预览帖子内图片, 更多功能查看readme
-// @version      0.1.3
+// @version      0.1.4
 // @author       bluebabes
 // @namespace    hjd2048.com
 // @match        https://*/*
@@ -26,8 +26,7 @@
   "use strict";
 
   var isSite2048 = false
-  // var siteUrl = "https://goto.rose2099-c.workers.dev/proxy/https://2048.cc/2048/" // 用于自定义
-  var siteUrl = ""
+  var siteUrl = "https://goto.rose2099-c.workers.dev/proxy/https://2048.cc/2048/" // 用于自定义
 
   if (document.title.indexOf('人人') === -1) {
     return
@@ -35,8 +34,9 @@
     isSite2048 = true
   }
 
+  // 搜索过滤版块（穷，没有米粒）
   const filterName = [
-    "优质图片", "E D 2 K","赚米专区","國內原創","求片专版","实时ＢＴ","网盘三区","明星合成","游戏下载","唯美清純","图你所图"
+    "优质图片", "E D 2 K","赚米专区","國內原創","求片专版","实时ＢＴ","网盘三区","明星合成","游戏下载","唯美清純","图你所图","网络见闻"
   ]
 
   $("head").append($(`<style></style>`));
