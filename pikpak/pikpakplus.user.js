@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pikpak助手plus
 // @namespace    http://tampermonkey.net/
-// @version      1.4.3
+// @version      1.4.4
 // @author       jdysya
 // @description  pikpak网盘助手的增强版，搭配代理可实现直连下载，支持推送文件夹到aria2中!
 // @license      MIT
@@ -431,110 +431,86 @@
         }
       };
 
-      // fix
+      // fix 将任务按 30-50 个一组 进行切割推送。这样既保证了速度，又极其稳定。
       const push = async () => {
-        const items = [...selectedItems.value];
-        let success = 0;
-        let fail = 0;
-        let errorMSG = "";
-        let retryList = [];
+        const allItems = [...selectedItems.value];
+        if (allItems.length === 0) return;
 
+        // 配置获取 (保持不变...)
         const ariaHost = window.localStorage.getItem("ariaHost") || "";
         const ariaPath = window.localStorage.getItem("ariaPath") || "";
         const ariaToken = window.localStorage.getItem("ariaToken") || "";
         const ariaParams = window.localStorage.getItem("ariaParams") || "";
 
-        if (!ariaHost) {
-          emits("msg", "请先配置aria2", "error");
-          close();
-          return;
-        }
+        // 分批处理函数：将数组按 size 切分
+        const chunk = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
 
-        console.log(`准备推送 ${items.length} 个项目`);
+        const batches = chunk(allItems, 40); // 每 40 个为一组，最稳妥
+        let totalSuccess = 0;
 
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
+        for (let [index, batchItems] of batches.entries()) {
           try {
-            const res = await getDownload(item.id);
-            if (res.error_description) throw new Error(res.error_description);
+            emits("msg", `正在推送第 ${index + 1}/${batches.length} 批次...`, "info");
 
-            // --- 核心修改：处理带文件夹层级的文件名 ---
-            let finalOut = res.name;
-            if (item.path) {
-              // 去掉路径最前面的斜杠，确保它是相对路径
-              let relativePath = item.path.startsWith("/") ? item.path.substring(1) : item.path;
+            // 1. 并发获取当前批次的下载链接
+            const downloadResults = await Promise.allSettled(batchItems.map(item => getDownload(item.id)));
 
-              // 如果 path 已经包含了文件名，直接用 path；
-              // 如果 path 只是目录名，则拼接文件名
-              if (relativePath.endsWith(res.name)) {
-                finalOut = relativePath;
-              } else {
-                // 确保目录和文件名之间有斜杠
-                finalOut = relativePath.endsWith("/") ? relativePath + res.name : relativePath + "/" + res.name;
+            // 2. 组装当前批次的 multicall
+            const calls = [];
+            downloadResults.forEach((result, idx) => {
+              if (result.status === "fulfilled" && !result.value.error_description) {
+                const res = result.value;
+                const item = batchItems[idx];
+
+                // 路径逻辑 (带文件夹层级)
+                let finalOut = res.name;
+                if (item.path) {
+                  let relPath = item.path.startsWith("/") ? item.path.substring(1) : item.path;
+                  finalOut = relPath.endsWith(res.name) ? relPath : (relPath.endsWith("/") ? relPath + res.name : relPath + "/" + res.name);
+                }
+
+                let options = { "out": finalOut };
+                if (ariaPath) options.dir = ariaPath;
+
+                // 组装参数
+                let methodParams = [[res.web_content_link], options];
+                if (ariaToken) methodParams.unshift(`token:${ariaToken}`);
+
+                calls.push({ methodName: "aria2.addUri", params: methodParams });
               }
-            }
+            });
 
-            let options = {
-              "out": finalOut
-            };
+            if (calls.length === 0) continue;
 
-            // 基础下载根目录
-            if (ariaPath) {
-              options.dir = ariaPath;
-            }
-
-            // 处理额外自定义参数
-            if (ariaParams) {
-              ariaParams.split(";").forEach(pair => {
-                const [key, value] = pair.split("=");
-                if (key && value) options[key.trim()] = value.trim();
-              });
-            }
-
-            // 构建符合 RPC 标准的参数数组 [token, [url], options]
-            let rpcParams = [];
-            if (ariaToken) rpcParams.push(`token:${ariaToken}`);
-            rpcParams.push([res.web_content_link]);
-            rpcParams.push(options);
-
-            const ariaData = {
-              id: Date.now() + i,
+            // 3. 推送当前批次
+            const multiCallData = {
+              id: Date.now(),
               jsonrpc: "2.0",
-              method: "aria2.addUri",
-              params: rpcParams
+              method: "system.multicall",
+              params: [calls]
             };
 
-            const ariaRes = await pushToAria(ariaHost, ariaData);
-            const resObj = typeof ariaRes === "string" ? JSON.parse(ariaRes) : ariaRes;
+            const response = await pushToAria(ariaHost, multiCallData);
+            const resObj = typeof response === "string" ? JSON.parse(response) : response;
 
             if (resObj.result) {
-              success++;
-              emits("msg", `第 ${i + 1} 个项目推送成功`, "success");
-            } else {
-              throw new Error(resObj.error?.message || "推送失败");
+              totalSuccess += resObj.result.length;
             }
 
+            // 每批次之间稍作停顿 (500ms)，防止 RPC 瞬间过载
+            await new Promise(resolve => setTimeout(resolve, 500));
+
           } catch (e) {
-            fail++;
-            errorMSG = e.message === "Unauthorized" ? "密钥不对" : e.message || "请求失败";
-            retryList.push(item);
-            emits("msg", `第 ${i + 1} 失败: ${errorMSG}`, "error");
+            console.error(`第 ${index + 1} 批次失败:`, e);
+            emits("msg", `第 ${index + 1} 批次部分失败`, "warning");
           }
         }
 
-        // 总结与重试
-        const resultType = fail === 0 ? "success" : (success === 0 ? "error" : "warning");
-        emits("msg", `成功:${success} 失败:${fail}`, resultType);
-
-        if (retryList.length > 0) {
-          setTimeout(() => {
-            selectedItems.value = retryList;
-            // push(); // 根据需要开启自动重试
-          }, 3000);
-        } else {
-          setTimeout(() => close(), 1000);
-        }
+        emits("msg", `全部推送结束，共成功 ${totalSuccess} 个`, "success");
+        setTimeout(() => close(), 2000);
       };
+
+
 
 
 
