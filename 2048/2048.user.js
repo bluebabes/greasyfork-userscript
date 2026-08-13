@@ -511,4 +511,11 @@ if (isUrlList() || href.indexOf("search.php") >= 0) {
   // mutationObserver.observe(document, { attributes: true, attributeFilter: ['href'] });
 
 
+    document
+        .querySelectorAll('ignore_js_op.att_img img.preview-img[data-original]')
+        .forEach(img => {
+            img.src = img.dataset.original;
+        });
+  
+
 })();
